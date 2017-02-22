@@ -32,8 +32,18 @@ y_Test <- as.factor(Data_Test[ ,6])
 
 
 ##======== final model ========##
-
-
+dtrain <- xgb.DMatrix(data = as.matrix(X_Train), label = (as.integer(y_Train)-1))
+dtest <- xgb.DMatrix(data = as.matrix(X_Test), label = (as.integer(y_Test)-1))
+wat_ls <- list(train=dtrain, test=dtest)
+Fit4 <- xgb.train(data = dtrain, max.depth = 2, eta = 0.02, nrounds = 100,
+                  watchlist = wat_ls, objective = "binary:logistic")
+yPred4 <- as.numeric(predict(Fit4, newdata = dtest, ntreelimit = 100) >= 0.5)
+cat("Precision: ", mean(yPred4==y_Test), "\n") # 0.75
+cat("Other Metrics are", "\n", sep=" ")
+mean(yPred4==1&y_Test==1) # 0.34
+mean(yPred4==0&y_Test==0) # 0.41
+mean(yPred4==1&y_Test==0) # 0.11
+mean(yPred4==0&y_Test==1) # 0.14
 
 
 ##========  step 1 generalized linear models  ============##
